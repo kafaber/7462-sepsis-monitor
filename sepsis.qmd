@@ -18,7 +18,27 @@ Sys.time()
 library(tidyverse)
 library(data.table) ## For the fread function
 library(lubridate)
+library(googledrive)
+library(DT)
 
 source("sepsis_monitor_functions.R")
 
+#Read in sepsis data file from google drive
+file_link <- "https://drive.google.com/file/d/1dYPoQSlCCo2LZqeBi8ia2oIhmCRI3rOF"
+sepsis <- drive_read_string(file_link) %>%
+  fread()
+
+
 ```
+
+Table of current sepsis patients:
+
+```{r}
+sepsis %>%
+  filter(SepsisLabel == 1) %>%
+  select(PatientID, HR, Temp, Resp) %>%
+  datatable()
+
+```
+
+Table of change in physiological conditions over last hour for all patients:
