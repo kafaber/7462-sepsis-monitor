@@ -1,0 +1,24 @@
+---
+title: "Sepsis Monitoring Report"
+author: "Kate Faber"
+format: html
+editor: visual
+execute: 
+  warning: false
+  message: false
+---
+
+```{r}
+print("Last updated:")
+Sys.time()
+```
+
+```{r}
+# Set up 
+library(tidyverse)
+library(data.table) ## For the fread function
+library(lubridate)
+
+source("sepsis_monitor_functions.R")
+
+```
