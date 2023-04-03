@@ -7,6 +7,8 @@ library(googledrive)
 file_link <- "https://drive.google.com/file/d/1dYPoQSlCCo2LZqeBi8ia2oIhmCRI3rOF"
 folder_link <- "https://drive.google.com/drive/folders/1kLWejSQfOG-eD2XpfpofpiDaYeKq4I2l"
 
+drive_deauth()
+
 #Read in sepsis data file from google drive
 sepsis <- drive_read_string(file_link) %>%
   fread()
