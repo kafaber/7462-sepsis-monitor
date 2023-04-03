@@ -4,6 +4,8 @@ library(data.table)
 library(lubridate)
 library(googledrive)
 
+source("sepsis_monitor_functions.R")
+
 file_link <- "https://drive.google.com/file/d/1dYPoQSlCCo2LZqeBi8ia2oIhmCRI3rOF"
 folder_link <- "https://drive.google.com/drive/folders/1kLWejSQfOG-eD2XpfpofpiDaYeKq4I2l"
 
