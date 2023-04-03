@@ -20,7 +20,7 @@ sepsis <- sepsis %>%
   updatePatients()
 
 #Write updated file back to google drive
-df %>% write_csv("sepsis_report_temp.csv")
+sepsis %>% write_csv("sepsis_report_temp.csv")
 drive_put(media = "sepsis_report_temp.csv",  
           path = folder_link,
           name = "sepsis_report.csv")
