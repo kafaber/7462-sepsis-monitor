@@ -38,10 +38,6 @@ jobs:
                any::forcats
                any::data.table
                any::tidyverse
-               
-      - name: Run sepsis data update script
-        run: source("sepsis_data_update.R")
-        shell: Rscript {0}
 
       - name: Render document
         uses: quarto-dev/quarto-actions/render@v2
