@@ -38,6 +38,9 @@ jobs:
                any::forcats
                any::data.table
                any::tidyverse
+               any::DT
+               any::googledrive
+               any::tictoc
 
       - name: Render document
         uses: quarto-dev/quarto-actions/render@v2
