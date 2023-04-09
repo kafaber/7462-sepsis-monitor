@@ -8,37 +8,74 @@ execute:
   message: false
 ---
 
-```{r}
-print("Last updated:")
-Sys.time()
-```
+Last updated: `r Sys.time()`
 
 ```{r}
 # Set up 
 library(tidyverse)
-library(data.table) ## For the fread function
+library(data.table)
 library(lubridate)
 library(googledrive)
 library(DT)
 
 source("sepsis_monitor_functions.R")
 
-#Read in sepsis data file from google drive
-file_link <- "https://drive.google.com/file/d/1dYPoQSlCCo2LZqeBi8ia2oIhmCRI3rOF"
-sepsis <- drive_read_string(file_link) %>%
-  fread()
+drive_folder_link <- "https://drive.google.com/drive/folders/1kLWejSQfOG-eD2XpfpofpiDaYeKq4I2l"
+drive_file_link <- "https://drive.google.com/file/d/100_D9wbWTOisrg8exmEkJUnigjJvOz4a"
 
+#Read in sepsis data file from google drive
+drive_deauth()
+
+#All data up until now
+new_data <- updateData(drive_file_link)
+
+#Include only most recent data
+most_recent_data <- new_data %>%
+  group_by(PatientID) %>%
+  filter(obsTime == max(obsTime))
 
 ```
 
-Table of current sepsis patients:
+### Table of current sepsis patients:
 
 ```{r}
-sepsis %>%
+current_sepsis_pts <- most_recent_data %>%
   filter(SepsisLabel == 1) %>%
-  select(PatientID, HR, Temp, Resp) %>%
-  datatable()
+  select(PatientID, HR, Temp, Resp) 
 
+current_sepsis_pts %>% datatable()
 ```
 
-Table of change in physiological conditions over last hour for all patients:
+### Plots of physiological variable history for current sepsis patients: 
+
+```{r}
+current_sepsis_pt_ids <- pull(current_sepsis_pts, PatientID)
+
+current_pt_history <- new_data %>%
+  filter(PatientID %in% current_sepsis_pt_ids) %>%
+  pivot_longer(c(HR, Temp, Resp), names_to = "phys_variable", values_to = "value")
+
+current_pt_history %>%
+  ggplot(aes(x = obsTime, y = value)) +
+  geom_point() +
+  facet_grid(vars(PatientID), vars(phys_variable), scales = "free")
+```
+
+### Table of changes in physiological variables between last two measurements for all patients: 
+
+```{r}
+phys_var_diff <- new_data %>% 
+  group_by(PatientID) %>%
+  slice_max(obsTime, n = 2) %>%
+  mutate(time_id = case_when(obsTime == max(obsTime) ~ "curr",
+                             obsTime < max(obsTime) ~ "prev")) %>%
+  select(PatientID, HR, Temp, Resp, time_id) %>%
+  pivot_wider(values_from = c(HR, Temp, Resp), names_from = time_id) %>%
+  mutate(delta_HR = HR_curr - HR_prev,
+         delta_Temp = Temp_curr - Temp_prev, 
+         delta_Resp = Resp_curr - Resp_prev) %>%
+  select(PatientID, delta_HR, delta_Temp, delta_Resp)
+
+phys_var_diff %>% datatable()
+```
+
